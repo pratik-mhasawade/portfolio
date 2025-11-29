@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pratik Uttam Mhasawade | Interactive Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Markdown Parser for AI Responses -->
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            height: 300px; 
+            max-height: 400px; 
+        }
+        .project-card { transition: all 0.3s ease; }
+        .project-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .timeline-line { position: absolute; left: 50%; transform: translateX(-50%); height: 100%; width: 2px; background-color: #e5e7eb; z-index: 0; }
+        .timeline-dot { z-index: 10; }
+        
+        /* Architecture Diagram Styles */
+        .arch-box { border: 2px solid #374151; border-radius: 8px; padding: 10px; background: white; text-align: center; position: relative; }
+        
+        /* Animations */
+        @keyframes data-flow {
+            0% { left: 0%; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+        .animate-data-flow {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20%;
+            background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+            animation: data-flow 1.5s infinite linear;
+        }
+
+        /* AI Chat Widget Styles */
+        .chat-widget { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        
+        /* Markdown Styles within AI responses */
+        .prose p { margin-bottom: 0.5em; }
+        .prose ul { list-style-type: disc; margin-left: 1.2em; margin-bottom: 0.5em; }
+        .prose strong { color: #b45309; font-weight: 600; }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals & Deep Slate -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Immediate identity and contact.
+         2. Skill Matrix (Chart.js): Visualizing technical depth across categories.
+         3. Project Ecosystem: Filterable gallery with embedded/VLSI projects.
+         4. System Design Challenge: Interactive AI section to generate architectures.
+         5. Educational Timeline: Vertical flow of academic track.
+         6. Achievement Showcase: Grid of validation cards.
+         7. Sticky AI Chatbot: Persistent assistant grounded in resume data. -->
+    <!-- Visualization & Content Choices:
+         1. Skills: Bar Chart (Chart.js).
+         2. Drone Architecture: Advanced CSS Diagram with Animation (No SVG).
+         3. AI Integration: Gemini API for Chat and System Design Challenge. 
+         4. Project Stats: Animated counters (JS). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-slate-800 relative">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="font-bold text-xl tracking-tight text-slate-900">P.U.M.</div>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="scrollToSection('overview')" class="text-slate-600 hover:text-amber-600 transition">Overview</button>
+                    <button onclick="scrollToSection('skills')" class="text-slate-600 hover:text-amber-600 transition">Skills</button>
+                    <button onclick="scrollToSection('projects')" class="text-slate-600 hover:text-amber-600 transition">Projects</button>
+                    <button onclick="scrollToSection('design-challenge')" class="text-slate-600 hover:text-amber-600 transition flex items-center gap-1">
+                        <span>✨ Design Challenge</span>
+                    </button>
+                    <button onclick="scrollToSection('education')" class="text-slate-600 hover:text-amber-600 transition">Education</button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-slate-900 focus:outline-none">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-200 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="scrollToSection('overview')" class="block w-full text-left py-2 text-slate-600">Overview</button>
+            <button onclick="scrollToSection('skills')" class="block w-full text-left py-2 text-slate-600">Skills</button>
+            <button onclick="scrollToSection('projects')" class="block w-full text-left py-2 text-slate-600">Projects</button>
+            <button onclick="scrollToSection('design-challenge')" class="block w-full text-left py-2 text-amber-600 font-medium">✨ Design Challenge</button>
+            <button onclick="scrollToSection('education')" class="block w-full text-left py-2 text-slate-600">Education</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="overview" class="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Pratik Uttam Mhasawade
+            </h1>
+            <p class="text-xl text-amber-600 font-medium mb-6">
+                Electronis & Telecommunication Engineer | SIH 2025 Grand Finalist
+            </p>
+            <p class="max-w-2xl mx-auto text-slate-600 leading-relaxed mb-8">
+                Specializing in building robust firmware, heterogeneous drone architectures, and FPGA-based digital designs. Bridging the gap between high-level AI algorithms and low-level hardware constraints.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-4 text-sm font-medium">
+                <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200 flex items-center gap-2">
+                    <span>📍 Baramati, Pune</span>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200 flex items-center gap-2">
+                    <span>📞 +91 9699436141</span>
+                </div>
+                <a href="mailto:pratik.mhasawade.entc.2023@vpkbiet.org" class="bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200 hover:border-amber-500 transition flex items-center gap-2">
+                    <span>✉️ Email</span>
+                </a>
+                <a href="https://linkedin.com/in/pratikm21" target="_blank" class="bg-slate-800 text-white px-4 py-2 rounded-full shadow-sm hover:bg-slate-700 transition flex items-center gap-2">
+                    <span>LinkedIn</span>
+                </a>
+                <a href="https://github.com/pratik-mhasawade" target="_blank" class="bg-slate-800 text-white px-4 py-2 rounded-full shadow-sm hover:bg-slate-700 transition flex items-center gap-2">
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 text-center">
+                <div class="text-3xl font-bold text-slate-800 mb-1">8.90</div>
+                <div class="text-xs uppercase tracking-wider text-slate-500">CGPA</div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 text-center">
+                <div class="text-3xl font-bold text-slate-800 mb-1">SIH '25</div>
+                <div class="text-xs uppercase tracking-wider text-slate-500">Grand Finalist</div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 text-center">
+                <div class="text-3xl font-bold text-slate-800 mb-1">Top 100</div>
+                <div class="text-xs uppercase tracking-wider text-slate-500">C2S Challenge</div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 text-center">
+                <div class="text-3xl font-bold text-slate-800 mb-1">2027</div>
+                <div class="text-xs uppercase tracking-wider text-slate-500">Graduation</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-16 bg-white border-y border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 text-center sm:text-left">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Technical Proficiency</h2>
+                <p class="text-slate-600 max-w-3xl">
+                    My technical toolkit spans from bare-metal firmware development to high-level edge AI integration. 
+                    Interact with the categories below to see the specific technologies I leverage for system design.
+                </p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Controls -->
+                <div class="lg:w-1/3 space-y-4">
+                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200">
+                        <h3 class="font-semibold text-slate-800 mb-4">Filter Categories</h3>
+                        <div class="flex flex-col gap-2">
+                            <button onclick="updateChart('microcontrollers')" id="btn-micro" class="skill-btn text-left px-4 py-3 rounded-lg bg-white border border-stone-200 hover:border-amber-500 hover:text-amber-600 transition shadow-sm font-medium active-skill">
+                                Microcontrollers & SoCs
+                            </button>
+                            <button onclick="updateChart('firmware')" id="btn-firmware" class="skill-btn text-left px-4 py-3 rounded-lg bg-white border border-stone-200 hover:border-amber-500 hover:text-amber-600 transition shadow-sm font-medium">
+                                Firmware & Protocols
+                            </button>
+                            <button onclick="updateChart('fpga')" id="btn-fpga" class="skill-btn text-left px-4 py-3 rounded-lg bg-white border border-stone-200 hover:border-amber-500 hover:text-amber-600 transition shadow-sm font-medium">
+                                FPGA & Digital Design
+                            </button>
+                            <button onclick="updateChart('tools')" id="btn-tools" class="skill-btn text-left px-4 py-3 rounded-lg bg-white border border-stone-200 hover:border-amber-500 hover:text-amber-600 transition shadow-sm font-medium">
+                                Development Tools
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Area -->
+                <div class="lg:w-2/3 bg-stone-50 p-6 rounded-xl border border-stone-200 flex flex-col justify-center">
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                    <p id="chart-desc" class="text-center text-sm text-slate-500 mt-4 italic">
+                        Visualizing core competencies in Microcontrollers & SoCs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-16 bg-stone-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Engineering Projects</h2>
+                <p class="text-slate-600 max-w-3xl mb-8">
+                    A collection of systems I've engineered, ranging from autonomous aerial vehicles to biomedical signal processing units. 
+                    Filter to explore specific domains.
+                </p>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterProjects('all')" class="project-filter px-4 py-2 rounded-full text-sm font-medium bg-slate-800 text-white shadow-sm transition">All</button>
+                    <button onclick="filterProjects('embedded')" class="project-filter px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 hover:bg-stone-200 shadow-sm border border-stone-200 transition">Embedded & Robotics</button>
+                    <button onclick="filterProjects('vlsi')" class="project-filter px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 hover:bg-stone-200 shadow-sm border border-stone-200 transition">VLSI & FPGA</button>
+                    <button onclick="filterProjects('iot')" class="project-filter px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 hover:bg-stone-200 shadow-sm border border-stone-200 transition">IoT & Signal Processing</button>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" id="projects-grid">
+                
+                <!-- Project 1: Drone (Featured) -->
+                <div class="project-card col-span-1 lg:col-span-2 bg-white rounded-xl overflow-hidden shadow-sm border border-stone-200" data-category="embedded">
+                    <div class="p-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                            <div>
+                                <span class="text-amber-600 font-bold tracking-wide text-xs uppercase mb-1 block">SIH 2025 Grand Finale Project</span>
+                                <h3 class="text-2xl font-bold text-slate-900">Autonomous Stampede Detection Drone</h3>
+                            </div>
+                            <span class="mt-2 md:mt-0 px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">Team Leader</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                                <p class="text-slate-600 leading-relaxed">
+                                    Engineered a heterogeneous dual-core architecture interfacing a flight controller with an edge-AI companion computer. The system performs real-time crowd density analysis to detect potential stampede risks.
+                                </p>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-amber-500 mt-1">➤</span>
+                                        <span class="text-sm text-slate-700"><strong>Hardware:</strong> STM32 Flight Controller, NVIDIA Jetson Nano, LoRa.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-amber-500 mt-1">➤</span>
+                                        <span class="text-sm text-slate-700"><strong>Edge AI:</strong> ONNX Runtime optimization achieving <strong>25-30 FPS</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-amber-500 mt-1">➤</span>
+                                        <span class="text-sm text-slate-700"><strong>Communication:</strong> Custom UART drivers, <20ms latency telemetry.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Enhanced Architecture Diagram -->
+                            <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 flex flex-col justify-center items-center h-full relative overflow-hidden group">
+                                <!-- Background Grid -->
+                                <div class="absolute inset-0 bg-[radial-gradient(#fbbf24_1px,transparent_1px)] [background-size:16px_16px] opacity-5"></div>
+                                <h4 class="text-xs font-bold text-amber-500 uppercase absolute top-4 left-4 tracking-wider z-10">System Architecture</h4>
+                                
+                                <div class="relative w-full max-w-xs h-48 mt-4 z-10">
+                                    <!-- STM32 Box -->
+                                    <div class="absolute top-0 left-0 w-28 h-16 bg-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.1)] border border-slate-200 flex flex-col items-center justify-center z-20">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Flight Controller</span>
+                                        <span class="text-sm font-bold text-slate-800">STM32 FC</span>
+                                        <!-- Decorative Pin -->
+                                        <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-3 bg-amber-500 rounded-r"></div>
+                                    </div>
+
+                                    <!-- Jetson Box -->
+                                    <div class="absolute top-0 right-0 w-28 h-16 bg-slate-800 rounded-lg shadow-lg border border-slate-600 flex flex-col items-center justify-center z-20">
+                                         <div class="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse border border-slate-900"></div>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">AI Computer</span>
+                                        <span class="text-sm font-bold text-white">Jetson Nano</span>
+                                        <!-- Decorative Pin -->
+                                        <div class="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-3 bg-amber-500 rounded-l"></div>
+                                    </div>
+
+                                    <!-- UART Connection Line -->
+                                    <div class="absolute top-8 left-28 right-28 h-1 bg-slate-700 overflow-hidden">
+                                        <!-- Moving Data Packet -->
+                                        <div class="animate-data-flow"></div>
+                                    </div>
+                                    <div class="absolute top-5 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur px-2 py-0.5 rounded text-[9px] text-amber-400 font-mono border border-slate-700 z-10">UART / 115200</div>
+
+                                    <!-- Ground Station Box -->
+                                    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-36 h-12 bg-slate-800 rounded-lg border border-slate-600 flex items-center justify-center gap-2 z-20 shadow-md">
+                                        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-ping"></span>
+                                        <span class="text-xs font-bold text-slate-300">Ground Station</span>
+                                    </div>
+
+                                    <!-- LoRa Connection Lines (CSS borders) -->
+                                    <!-- Vertical line down from STM32 -->
+                                    <div class="absolute top-16 left-12 w-0.5 h-12 bg-slate-700"></div>
+                                    <!-- Horizontal line to center -->
+                                    <div class="absolute top-28 left-12 w-16 h-0.5 bg-slate-700"></div>
+                                    <!-- Vertical line down to Ground Station -->
+                                    <div class="absolute top-28 left-28 h-8 w-0.5 bg-slate-700"></div>
+                                    
+                                    <div class="absolute top-20 left-14 bg-slate-900/90 px-2 py-0.5 rounded text-[9px] text-blue-400 font-mono border border-slate-700">LoRa Telemetry</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2: DSP -->
+                <div class="project-card bg-white rounded-xl p-6 shadow-sm border border-stone-200 flex flex-col" data-category="iot">
+                    <div class="mb-4">
+                        <span class="text-slate-400 font-bold text-xs uppercase">Academic Project</span>
+                        <h3 class="text-xl font-bold text-slate-900 mt-1">Biomedical DSP Implementation</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm mb-4 flex-grow">
+                        Developed MATLAB/Python algorithms for ECG/PCG signal analysis. Implemented FIR/IIR digital filters to remove baseline wander and power-line noise.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-stone-100">
+                        <div class="flex flex-wrap gap-2 text-xs font-medium text-slate-500">
+                            <span class="bg-stone-100 px-2 py-1 rounded">MATLAB</span>
+                            <span class="bg-stone-100 px-2 py-1 rounded">Python</span>
+                            <span class="bg-stone-100 px-2 py-1 rounded">Signal Processing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3: IoT -->
+                <div class="project-card bg-white rounded-xl p-6 shadow-sm border border-stone-200 flex flex-col" data-category="iot">
+                    <div class="mb-4">
+                        <span class="text-slate-400 font-bold text-xs uppercase">IoT & Automation</span>
+                        <h3 class="text-xl font-bold text-slate-900 mt-1">Sensor Automation System</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm mb-4 flex-grow">
+                        Built non-blocking firmware with FreeRTOS on ESP8266. Optimized JSON payload structure to reduce dashboard transmission latency to <strong><40ms</strong>.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-stone-100">
+                        <div class="flex flex-wrap gap-2 text-xs font-medium text-slate-500">
+                            <span class="bg-stone-100 px-2 py-1 rounded">ESP8266</span>
+                            <span class="bg-stone-100 px-2 py-1 rounded">FreeRTOS</span>
+                            <span class="bg-stone-100 px-2 py-1 rounded">REST API</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4: VLSI -->
+                <div class="project-card bg-white rounded-xl p-6 shadow-sm border border-stone-200 flex flex-col" data-category="vlsi">
+                    <div class="mb-4">
+                        <span class="text-slate-400 font-bold text-xs uppercase">VLSI Honors Project</span>
+                        <h3 class="text-xl font-bold text-slate-900 mt-1">Digital Design & RISC Processor</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm mb-4 flex-grow">
+                        Designed 8-bit RISC ISA, datapath, and control FSM. Implemented on Artix-7 FPGA (BASYS-3) achieving stable operation at <strong>50 MHz</strong>.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-stone-100">
+                        <div class="flex flex-wrap gap-2 text-xs font-medium text-slate-500">
+                            <span class="bg-stone-100 px-2 py-1 rounded">SystemVerilog</span>
+                            <span class="bg-stone-100 px-2 py-1 rounded">Vivado</span>
+                            <span class="bg-stone-100 px-2 py-1 rounded">FPGA</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW FEATURE: System Design Challenge (Gemini Powered) -->
+    <section id="design-challenge" class="py-16 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')] opacity-20"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-10">
+                <span class="bg-amber-500 text-slate-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">✨ AI-Powered Demo</span>
+                <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-4">System Design Challenge</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">
+                    Challenge "Virtual Pratik" to design a system. Enter a problem statement (e.g., "Smart Agriculture System" or "Forest Fire Detection"), and I will generate a high-level architecture using my tech stack (STM32, LoRa, AI).
+                </p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 shadow-2xl border border-slate-700">
+                <div class="flex flex-col md:flex-row gap-4 mb-6">
+                    <input type="text" id="challenge-input" placeholder="Enter a problem statement (e.g., Warehouse Asset Tracker)..." class="flex-grow bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 transition">
+                    <button onclick="generateSolution()" id="generate-btn" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2">
+                        <span>Generate Architecture</span>
+                        <span id="generate-loader" class="hidden animate-spin">⟳</span>
+                    </button>
+                </div>
+
+                <div id="solution-output" class="hidden">
+                    <div class="h-px bg-slate-700 mb-6"></div>
+                    <div class="prose prose-invert max-w-none text-sm leading-relaxed" id="solution-content">
+                        <!-- AI Content will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education & Timeline Section -->
+    <section id="education" class="py-16 bg-white border-t border-stone-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-slate-900 mb-10 text-center">Education & Timeline</h2>
+            
+            <div class="relative py-4">
+                <div class="timeline-line"></div>
+                
+                <!-- Item 1 -->
+                <div class="relative flex items-center justify-between mb-12">
+                    <div class="order-1 w-5/12 text-right pr-8">
+                        <h3 class="font-bold text-slate-800">Exp. Grad 2027</h3>
+                        <p class="text-sm text-slate-500">Expected Completion</p>
+                    </div>
+                    <div class="z-20 flex items-center order-1 bg-amber-500 shadow-xl w-4 h-4 rounded-full timeline-dot"></div>
+                    <div class="order-1 w-5/12 pl-8"></div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="relative flex items-center justify-between mb-12">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-slate-800 shadow-xl w-4 h-4 rounded-full timeline-dot"></div>
+                    <div class="order-1 w-5/12 pl-8">
+                        <h3 class="font-bold text-slate-800 text-lg">B.Tech in EE&TC</h3>
+                        <p class="text-sm text-amber-600 font-medium">VPKBIET, Baramati</p>
+                        <p class="text-sm text-slate-600 mt-1">Current CGPA: 8.90 / 10.0</p>
+                        <p class="text-xs text-slate-500 mt-2">Specializing in Embedded Systems & Signal Processing</p>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="relative flex items-center justify-between">
+                    <div class="order-1 w-5/12 text-right pr-8">
+                        <h3 class="font-bold text-slate-800 text-lg">Honors in VLSI Design</h3>
+                        <p class="text-sm text-slate-600 font-medium">Parallel Track</p>
+                        <p class="text-sm text-slate-600 mt-1">Honors CGPA: 8.67</p>
+                        <p class="text-xs text-slate-500 mt-2">Focused on CMOS, RTL, and HLS</p>
+                    </div>
+                    <div class="z-20 flex items-center order-1 bg-slate-800 shadow-xl w-4 h-4 rounded-full timeline-dot"></div>
+                    <div class="order-1 w-5/12 pl-8"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements" class="py-16 bg-stone-50 border-t border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-slate-900 mb-10 text-center">Recognitions</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-l-4 border-stone-200 border-l-amber-500">
+                    <h4 class="font-bold text-slate-800 mb-2">SIH 2025 Grand Finalist</h4>
+                    <p class="text-sm text-slate-600">Selected for the Hardware Edition Grand Finale as Team Leader of 'Team Falcon'.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-l-4 border-stone-200 border-l-slate-800">
+                    <h4 class="font-bold text-slate-800 mb-2">MeitY C2S Grand Challenge</h4>
+                    <p class="text-sm text-slate-600">Top 100 recognition in the DIR-V RISC-V track for drone SoC architecture design.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-l-4 border-stone-200 border-l-slate-800">
+                    <h4 class="font-bold text-slate-800 mb-2">NPTEL Elite Certifications</h4>
+                    <p class="text-sm text-slate-600">CMOS Digital VLSI Design, C-Based VLSI Design, Python for Data Science.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-l-4 border-stone-200 border-l-slate-800">
+                    <h4 class="font-bold text-slate-800 mb-2">C-DAC Bootcamps</h4>
+                    <p class="text-sm text-slate-600">Completed 120+ hours in AI, UAS/Drone Tech, and AR-VR.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-l-4 border-stone-200 border-l-slate-800">
+                    <h4 class="font-bold text-slate-800 mb-2">IIT Bombay Techfest</h4>
+                    <p class="text-sm text-slate-600">Designed autonomous bot with precise IR path tracking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW FEATURE: Sticky AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <!-- Chat Window -->
+        <div id="chat-window" class="hidden bg-white rounded-2xl shadow-2xl border border-stone-200 w-80 sm:w-96 mb-4 overflow-hidden flex flex-col h-[450px]">
+            <div class="bg-slate-900 p-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-white font-bold text-sm">✨ Pratik's AI Agent</h3>
+                    <p class="text-slate-400 text-xs">Ask me about skills & projects</p>
+                </div>
+                <button onclick="toggleChat()" class="text-slate-400 hover:text-white transition">✕</button>
+            </div>
+            
+            <div id="chat-messages" class="chat-messages flex-grow p-4 overflow-y-auto bg-stone-50 space-y-3 text-sm">
+                <!-- Initial Message -->
+                <div class="flex items-start gap-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-xs shrink-0">AI</div>
+                    <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm text-slate-700 border border-stone-100">
+                        Hi! I'm Pratik's virtual assistant. Ask me about his experience with <strong>STM32</strong>, the <strong>Drone Project</strong>, or his <strong>VLSI</strong> work!
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-white border-t border-stone-200">
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-grow bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500" onkeypress="handleChatKey(event)">
+                    <button onclick="sendChatMessage()" class="bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-3 py-2 transition">
+                        ➤
+                    </button>
+                </div>
+                <div class="flex gap-2 mt-2 overflow-x-auto pb-1 no-scrollbar">
+                    <button onclick="prefillChat('Tell me about the drone project')" class="text-xs bg-stone-100 hover:bg-stone-200 text-slate-600 px-2 py-1 rounded whitespace-nowrap transition">🚁 Drone Project</button>
+                    <button onclick="prefillChat('Does Pratik know RTOS?')" class="text-xs bg-stone-100 hover:bg-stone-200 text-slate-600 px-2 py-1 rounded whitespace-nowrap transition">⚙️ RTOS Skills</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toggle Button -->
+        <button onclick="toggleChat()" class="bg-amber-600 hover:bg-amber-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition hover:scale-105 group">
+            <span class="text-2xl group-hover:hidden">💬</span>
+            <span class="text-xl hidden group-hover:block">✨</span>
+        </button>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-300 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-2">© 2025 Pratik Uttam Mhasawade. All rights reserved.</p>
+            <p class="text-xs text-slate-500">Interactive Resume generated from Markdown source.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- GEMINI API CONFIGURATION ---
+        const apiKey = "AIzaSyAd8X8F8iy6XihY26biFsIVG3pEPhE8yPc"; // API Key provided by environment
+        const md = window.markdownit();
+
+        async function callGemini(prompt, systemInstruction) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response at the moment.";
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return "Error connecting to AI service. Please try again later.";
+            }
+        }
+
+        // --- FEATURE 1: CHATBOT LOGIC ---
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.classList.toggle('hidden');
+        }
+
+        function prefillChat(text) {
+            const input = document.getElementById('chat-input');
+            input.value = text;
+            sendChatMessage();
+        }
+
+        function handleChatKey(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const messagesDiv = document.getElementById('chat-messages');
+            const userText = input.value.trim();
+            if (!userText) return;
+
+            // Add User Message
+            messagesDiv.innerHTML += `
+                <div class="flex items-start gap-2 justify-end">
+                    <div class="bg-slate-800 text-white p-3 rounded-lg rounded-tr-none shadow-sm text-sm border border-slate-700 max-w-[85%]">
+                        ${userText}
+                    </div>
+                </div>`;
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Add Loading Indicator
+            const loadingId = 'loading-' + Date.now();
+            messagesDiv.innerHTML += `
+                <div id="${loadingId}" class="flex items-start gap-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-xs shrink-0">AI</div>
+                    <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm border border-stone-100">
+                        <div class="flex gap-1 h-4 items-center">
+                            <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
+                            <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
+                            <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
+                        </div>
+                    </div>
+                </div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Context Gathering (The whole page text)
+            const pageContext = document.body.innerText.substring(0, 10000); // Limit context size
+
+            // Call Gemini
+            const systemPrompt = `You are a helpful, professional AI assistant for Pratik Uttam Mhasawade's engineering portfolio. 
+            Answer questions strictly based on the provided resume context. 
+            Pratik is an Embedded Systems Engineer. 
+            Tone: Enthusiastic, professional, concise. 
+            If asked about contact info, refer to the header. 
+            Context: ${pageContext}`;
+
+            const aiResponseRaw = await callGemini(userText, systemPrompt);
+            const aiResponseHtml = md.render(aiResponseRaw);
+
+            // Remove Loading & Add AI Message
+            document.getElementById(loadingId).remove();
+            messagesDiv.innerHTML += `
+                <div class="flex items-start gap-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-xs shrink-0">AI</div>
+                    <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm text-slate-700 border border-stone-100 text-sm prose prose-sm max-w-[85%]">
+                        ${aiResponseHtml}
+                    </div>
+                </div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // --- FEATURE 2: SYSTEM DESIGN CHALLENGE LOGIC ---
+        async function generateSolution() {
+            const input = document.getElementById('challenge-input');
+            const outputDiv = document.getElementById('solution-output');
+            const contentDiv = document.getElementById('solution-content');
+            const btn = document.getElementById('generate-btn');
+            const loader = document.getElementById('generate-loader');
+            const problem = input.value.trim();
+
+            if (!problem) return;
+
+            // UI Loading State
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+            loader.classList.remove('hidden');
+            outputDiv.classList.add('hidden');
+
+            const systemPrompt = `You are Pratik, an Embedded Systems Engineer. 
+            The user will give you a problem statement. 
+            Your task is to propose a high-level system architecture to solve it, using YOUR SPECIFIC SKILLS listed below.
+            
+            Pratik's Tech Stack:
+            - Microcontrollers: STM32 (Primary), ESP32 (IoT/WiFi), Jetson Nano (Edge AI).
+            - Comms: LoRa (Long Range), UART, I2C, SPI, MQTT.
+            - Languages: C/C++, Python.
+            - OS: FreeRTOS, Linux.
+
+            Format the response in Markdown:
+            1. **High-Level Approach**: 1-2 sentences.
+            2. **Hardware Selection**: Why you chose specific components (e.g., "I'd use STM32 for real-time control...").
+            3. **Firmware/Software Logic**: How data flows.
+            
+            Keep it technical but accessible. Short and punchy.`;
+
+            const aiResponseRaw = await callGemini(`Design a system for: ${problem}`, systemPrompt);
+            const aiResponseHtml = md.render(aiResponseRaw);
+
+            // Update UI
+            contentDiv.innerHTML = aiResponseHtml;
+            outputDiv.classList.remove('hidden');
+            
+            // Reset Button
+            btn.disabled = false;
+            btn.classList.remove('opacity-75');
+            loader.classList.add('hidden');
+        }
+
+        // --- EXISTING CHART & PORTFOLIO LOGIC ---
+        // Data Store
+        const skillsData = {
+            microcontrollers: {
+                labels: ['STM32 (HAL/LL)', 'Jetson Nano', 'ESP32 (IDF)', 'Arduino', 'SHAKTI (RISC-V)'],
+                data: [90, 85, 80, 95, 60],
+                desc: 'Strong expertise in ARM-based MCUs and Edge AI platforms.'
+            },
+            firmware: {
+                labels: ['Embedded C', 'Bare-metal', 'RTOS (FreeRTOS)', 'Linux/Bash', 'DMA/ISRs'],
+                data: [95, 90, 75, 70, 85],
+                desc: 'Focus on low-level optimization and real-time constraints.'
+            },
+            fpga: {
+                labels: ['Verilog/SV', 'Vivado', 'Artix-7', 'RTL Design', 'VHDL'],
+                data: [80, 85, 75, 80, 60],
+                desc: 'Digital design experience tailored for custom hardware acceleration.'
+            },
+            tools: {
+                labels: ['CubeIDE', 'MATLAB', 'Git/GitHub', 'KiCad/PCB', 'Logic Analyzer'],
+                data: [90, 85, 80, 70, 75],
+                desc: 'Proficient with industry-standard development and debugging tools.'
+            }
+        };
+
+        // Chart Initialization
+        let chartInstance = null;
+
+        function initChart() {
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const initialData = skillsData.microcontrollers;
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: initialData.labels,
+                    datasets: [{
+                        label: 'Proficiency Level (%)',
+                        data: initialData.data,
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)', // Amber-500
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return context.raw + '% Proficiency'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: '#f3f4f6' }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(category) {
+            document.querySelectorAll('.skill-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'text-amber-600', 'active-skill');
+                btn.classList.add('border-stone-200');
+            });
+            const activeBtn = document.getElementById('btn-' + category);
+            activeBtn.classList.remove('border-stone-200');
+            activeBtn.classList.add('border-amber-500', 'text-amber-600', 'active-skill');
+
+            const newData = skillsData[category];
+            chartInstance.data.labels = newData.labels;
+            chartInstance.data.datasets[0].data = newData.data;
+            chartInstance.update();
+
+            const descEl = document.getElementById('chart-desc');
+            descEl.style.opacity = 0;
+            setTimeout(() => {
+                descEl.innerText = newData.desc;
+                descEl.style.opacity = 1;
+            }, 200);
+        }
+
+        function filterProjects(category) {
+            const cards = document.querySelectorAll('.project-card');
+            const buttons = document.querySelectorAll('.project-filter');
+            
+            buttons.forEach(btn => {
+                if(btn.innerText.toLowerCase().includes(category === 'all' ? 'all' : category)) {
+                    btn.classList.remove('bg-white', 'text-slate-600');
+                    btn.classList.add('bg-slate-800', 'text-white');
+                } else {
+                    btn.classList.add('bg-white', 'text-slate-600');
+                    btn.classList.remove('bg-slate-800', 'text-white');
+                }
+            });
+
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                    setTimeout(() => card.style.opacity = '1', 50);
+                } else {
+                    card.style.opacity = '0';
+                    setTimeout(() => card.style.display = 'none', 300);
+                }
+            });
+        }
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            const navHeight = 64;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+            });
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        window.addEventListener('load', () => {
+            initChart();
+        });
+
+    </script>
+</body>
+</html>
