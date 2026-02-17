@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pratik Uttam Mhasawade | Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="profile-block">
+        <img class="avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80" alt="Pratik profile" />
+        <h1>Pratik Uttam Mhasawade</h1>
+        <p class="tagline">Hardware Engineer • RISC-V • FPGA Systems</p>
+      </div>
+
+      <button class="menu-toggle" aria-expanded="false" aria-controls="nav-links">Menu</button>
+      <nav id="nav-links" class="nav-links">
+        <a class="active" href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#education">Education</a>
+        <a href="#contact">Contact</a>
+        <a href="projects.html">Projects</a>
+        <a href="experience.html">Experience</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="social-links">
+          <a href="https://github.com" aria-label="GitHub">GitHub</a>
+          <a href="https://linkedin.com" aria-label="LinkedIn">LinkedIn</a>
+        </div>
+        <a class="resume-btn" href="#">Download Resume</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section id="about" class="card reveal">
+        <h2>About Me</h2>
+        <p>
+          I build structured hardware systems focused on performance, area efficiency, and clean RTL. My work spans FPGA
+          prototyping, RISC-V microarchitecture experimentation, and accelerator-oriented digital design.
+        </p>
+        <div class="stats-grid">
+          <div><strong>11</strong><span>Projects</span></div>
+          <div><strong>6</strong><span>FPGA Boards</span></div>
+          <div><strong>30+</strong><span>RTL Modules Built</span></div>
+        </div>
+      </section>
+
+      <hr />
+
+      <section id="skills" class="card reveal">
+        <h2>Technical Skills</h2>
+        <div class="skills-grid">
+          <article><h3>Digital Design</h3><p>Verilog, SystemVerilog, FSM, pipelining</p></article>
+          <article><h3>Compute</h3><p>RISC-V, ISA extensions, AI acceleration</p></article>
+          <article><h3>FPGA</h3><p>Xilinx Vivado, timing closure, debugging</p></article>
+          <article><h3>Tools</h3><p>ModelSim, GTKWave, Git, Linux</p></article>
+          <article><h3>Software</h3><p>C/C++, Python, dataflow modeling</p></article>
+          <article><h3>Currently Exploring</h3><p>Quantized GEMM mapping on FPGA fabric</p></article>
+        </div>
+      </section>
+
+      <hr />
+
+      <section id="education" class="card reveal">
+        <h2>Education</h2>
+        <h3>Bachelor of Technology in Electronics</h3>
+        <p>Specialized in embedded systems, digital signal processing, and processor architecture labs.</p>
+      </section>
+
+      <hr />
+
+      <section id="contact" class="card reveal">
+        <h2>Career Objective</h2>
+        <p>
+          To contribute to high-impact silicon and embedded compute products by designing efficient hardware blocks for
+          real-world workloads at companies such as TI, NVIDIA, and Qualcomm.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
